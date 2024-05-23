@@ -1,0 +1,9 @@
+@font-face {
+	font-family: 'myLXGW';
+	src: url('https://github.com/WangZhSi/WangZhSi.github.io/blob/main/_assets/_font/LXGW.ttf');
+}
+
+body{
+	font-family: 'myLXGW', 'sans-serif';
+	font-size: 20;
+}
