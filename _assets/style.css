@@ -3,17 +3,17 @@
 	src: url('https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/_font/LXGW.ttf');
 }
 
-body{
+.body{
 	font-family: 'Arial', 'myLXGW';
 	font-size: 20;
 }
 
-markdown-body{
+.markdown-body{
 	font-family: 'Arial', 'myLXGW';
 	font-size: 16;
 }
 
-markdown-title{
+.markdown-title{
 	font-family: 'Arial', 'myLXGW';
 	font-size: 20;
 }
