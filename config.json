@@ -4,5 +4,5 @@
     "avatarUrl":"https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG",
     "GMEEK_VERSION":"last",
     "startSite":"05/23/2024",
-    "style": "<link href='https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/style.css' rel='stylesheet' />"
+    "style": "<link href='https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/style.css' rel='stylesheet' /><style>.markdown-*{font-family: myLXGW, Arial;}</style>"
 }

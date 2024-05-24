@@ -5,15 +5,14 @@
 
 body{
 	font-family: 'Arial', 'myLXGW';
-	font-size: 12;
+	font-size: 20;
 }
 
 .markdown-body{
 	font-family: 'Arial', 'myLXGW';
-	font-size: 4;
+	font-size: 18;
 }
 
 .markdown-title{
 	font-family: 'Arial', 'myLXGW';
-	font-size: 8;
 }
