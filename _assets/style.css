@@ -4,6 +4,16 @@
 }
 
 body{
-	font-family: 'myLXGW', 'sans-serif';
+	font-family: 'Arial', 'myLXGW';
+	font-size: 20;
+}
+
+markdown-body{
+	font-family: 'Arial', 'myLXGW';
+	font-size: 16;
+}
+
+markdown-title{
+	font-family: 'Arial', 'myLXGW';
 	font-size: 20;
 }
