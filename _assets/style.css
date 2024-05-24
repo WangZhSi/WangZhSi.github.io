@@ -3,16 +3,21 @@
 	src: url('https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/_font/LXGW.ttf');
 }
 
+@font-face {
+	font-family: 'myFira';
+	src: url('https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/_font/myFira.ttf');
+}
+
 body{
-	font-family: 'Arial', 'myLXGW';
+	font-family: 'myFira', 'myLXGW';
 	font-size: 20;
 }
 
 .markdown-body{
-	font-family: 'Arial', 'myLXGW';
+	font-family: 'myFira', 'myLXGW';
 	font-size: 18;
 }
 
 .markdown-title{
-	font-family: 'Arial', 'myLXGW';
+	font-family: 'myFira', 'myLXGW';
 }
