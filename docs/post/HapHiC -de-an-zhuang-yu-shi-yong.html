@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="//cdn.staticfile.net/Primer/21.0.7/primer.css" rel="stylesheet" />
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="[HapHiC](https://github.com/zengxiaofei/HapHiC) 是一款 reference free 的基因组 scaffolding 软件，论文预印本发表在 [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.11.18.567668v1.full) 上。">
+<meta property="og:title" content="HapHiC 的安装与使用">
+<meta property="og:description" content="[HapHiC](https://github.com/zengxiaofei/HapHiC) 是一款 reference free 的基因组 scaffolding 软件，论文预印本发表在 [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.11.18.567668v1.full) 上。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://WangZhSi.github.io/post/HapHiC%20-de-an-zhuang-yu-shi-yong.html">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG">
+<title>HapHiC 的安装与使用</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+</style>
+<link href='https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/style.css' rel='stylesheet' /><style>.markdown-body{font-family: myLXGW, Arial;}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">HapHiC 的安装与使用</h1>
+<div class="title-right">
+    <a href="https://WangZhSi.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/WangZhSi/WangZhSi.github.io/issues/3" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a href="https://github.com/zengxiaofei/HapHiC">HapHiC</a> 是一款 reference free 的基因组 scaffolding 软件，论文预印本发表在 <a href="https://www.biorxiv.org/content/10.1101/2023.11.18.567668v1.full" rel="nofollow">bioRxiv</a> 上。论文一作 Xiaofei Zeng 在个人博客中做了一些 HapHiC 软件的系列教程以及使用技巧，虽然今年三月的时候还回复过评论，但是文章已经很久没更新了；</p>
+<p>近期在尝试测试这个软件的时候发现找不到中文教程，不如自己写一篇，帮助有相同需求的朋友；</p>
+<h1>软件安装</h1>
+<p><strong>推荐使用 conda 安装，不介绍手动安装的方式</strong>, 首先 clone 仓库到本地，我一般习惯 clone 到 conda/envs 目录下：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ git clone https://github.com/zengxiaofei/HapHiC.git</pre></div>
+<p>使用 clone 下来仓库中的 yml 文件构建 conda 环境：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">conda env create -f HapHiC/conda_env/environment_py310.yml</pre></div>
+<p>安装完成后，可以 soure 环境，也可以将构建环境的 bin 目录 export 到环境变量中，要是用的频繁就写到 .bashrc 里：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">source</span> conda/bin/activate haphic
+<span class="pl-c"><span class="pl-c">#</span> or</span>
+<span class="pl-k">export</span> PATH=/path/to/haphic/bin:<span class="pl-smi">$PATH</span></pre></div>
+<p>软件自带检测工具，check 一下；注意，这个 haphic 主流程文件在 clone 下来的仓库目录下，不在 conda create 的环境下，我第一次就没找到：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/path/to/HapHiC/haphic check</pre></div>
+<p>check 通过，空运行软件弹出欢迎界面，使用 <code class="notranslate">--help</code> 查看参数即可；</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/path/to/HapHiC/haphic --help</pre></div>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.png" alt="" style="max-width: 100%;"></a></p>
+<p><strong>有几个点需要注意：</strong></p>
+<ol>
+<li><code class="notranslate">git clone</code> 下来的仓库名称是 HapHiC, 而基于 yml 文件构建的环境名称是 haphic; 如果你像我一样将仓库 clone 到了 conda/envs 目录下，这样这个目录会有 HapHiC 和 haphic 两个文件夹；如果介意请手动修改 yml 文件；</li>
+<li>部分 python 包是基于 pip 安装下载的，如果没有事先配置过 pip config, 下载会比较慢，部分包下载超时导致安装包错；建议事先配置 pip 的清华源；不同的 pip 用的是同一个 home 路径下的 config, 所以可以用一个已装好的 pip 配置一下；</li>
+<li>安装流程中第三步的 check 非常有必要，流程自动检查软件运行的关键包是否正确安装，哪个包失败 <code class="notranslate">pip install</code> 一下就可以了；<br>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic2.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic2.png" alt="" style="max-width: 100%;"></a></li>
+<li>软件接口极多，部分接口和 ALLHiC 是一样的，如果之前用过 ALLHiC 可能容易理解一些；我之前没用过 ALLHiC, 啃这些接口有点吃力；发现 ALLHiC 作者还挺浪漫，用宇宙真理做随机种子：<br>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic3.png" alt="" style="max-width: 100%;"></a></li>
+<li>软件默认基于 python 10, 所以对 gcc 版本以及 glib 库版本有一定要求，较老的集群应该无法安装；</li>
+</ol>
+<h1>软件使用</h1>
+<h2>reads 比对</h2>
+<p>比对这里还是需要说一下：</p>
+<h3>基于 bwa 的比对</h3>
+<p>使用软件之前，需要事先准备比对好的结果文件，作者推荐使用 bwa 的比对方法：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ bwa index asm.fa
+$ bwa mem -5SP asm.fa /path/to/read1_fq.gz /path/to/read2_fq.gz <span class="pl-k">|</span> samblaster <span class="pl-k">|</span> samtools view - -@ 14 -S -h -b -F 3340 -o HiC.bam
+$ /path/to/HapHiC/utils/filter_bam HiC.bam 1 --nm 3 --threads 14 <span class="pl-k">|</span> samtools view - -b -@ 14 -o HiC.filtered.bam</pre></div>
+<p>我们拆解一下作者这里的意图：</p>
+<ol>
+<li><code class="notranslate">-5SP</code>: 在质量值低于 5 的碱基末端增加剪辑标记 S;</li>
+<li><code class="notranslate">samblaster</code>: 一般用于去除 PCR dup;</li>
+<li><code class="notranslate">-F 3340</code>: 过滤 PCR dup 和次比对；</li>
+<li>后面还使用自己封装的 <code class="notranslate">filter_bam</code> 做进一步过滤，根据说明默认处理的是 <code class="notranslate">MAPQ ≥ 1</code> 和 <code class="notranslate">NM &lt; 3</code> 情况；</li>
+</ol>
+<h3>基于 chromap 的比对</h3>
+<p>在 V 1.0.3 版本更新中，软件支持了 chromap 输出的 pairs 格式：</p>
+<blockquote>
+<ul>
+<li>Version 1.0.3 (2024.03.21): Add support for the <a href="https://github.com/4dn-dcic/pairix/blob/master/pairs_format_specification.md">pairs format</a> used in <a href="https://github.com/haowenz/chromap">chromap</a>.</li>
+</ul>
+</blockquote>
+<p>我个人非常喜欢 chromap 这个软件，单独说一下这里：</p>
+<ol>
+<li>chromap 比对本身支持 <code class="notranslate">--remove-pcr-duplicates</code> 去除 PCR dup;</li>
+<li>生成 pairs 的比对速度远高于生成 sam 的速度（约 1/3), 这还不算后续处理 sam 的 <code class="notranslate">view</code> 和 <code class="notranslate">sort</code> 的时间消耗；从时间成本上非常理想；</li>
+</ol>
+<h3>其他注意事项</h3>
+<p>这里有一点其他注意事项和建议：</p>
+<ol>
+<li>毕竟是新软件，要考虑兼容已有分析流程；目前 HapHiC 仅支持 bam 文件格式及 pairs 文件格式作为比对结果输入，不支持如 bed 等其他比对结果格式；建议根据自己已有的流程决定具体使用 bam 还是 pairs;</li>
+<li>对于 bam 文件，作者强调了** DO NOT sort it by coordinate**, 如果已有了之前处理过的 bam, 建议 <code class="notranslate">sort -n</code> 一下避免后续流程报错；</li>
+</ol>
+<h2>HapHiC 分析</h2>
+<h3>One-line command</h3>
+<p>软件分析本身分为四步，但支持 one-line command 一行命令出结果</p>
+<ol>
+<li>Clustering</li>
+<li>Reassignment</li>
+<li>Ordering and orientation</li>
+<li>Building pseudomolecules</li>
+</ol>
+<p>如果有需要可以分步具体处理，这样还挺好的，针对性很强，异常中断也不需要从头再来了，这里仅介绍直出结果的模式：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ /path/to/HapHiC/haphic pipeline asm.fa HiC.filtered.bam nchrs</pre></div>
+<p>比对结果，草图，预估染色体数量，三个参数就可以启动分析了，很方便；挑几个我测了的接口说一下：</p>
+<ul>
+<li>流程默认的酶切位点是 <code class="notranslate">GATC</code> (MboI/DpnII), 如果是其他酶可以使用 <code class="notranslate">--RE</code> 接口调整；</li>
+<li>对于多倍体，或未分型的数据，我实际测试发现直接运行可能报错，加上 <code class="notranslate">--remove_allelic_links</code> 参数可以解决；</li>
+<li><code class="notranslate">--correct_nrounds</code> 支持多轮自动纠错 contig, 可能会切割现有草图 (contig); 这里要注意，切割后的 fa 未必能接入你的现有流程；如果确实需要切割处理，不如自己在 juice box 里面切，结果接入下游分析更方便；</li>
+</ul>
+<h3>结果说明</h3>
+<p>不考虑处理中间结果的情况下，结果输出在 <code class="notranslate">04.build</code> 目录下，包括以下内容：</p>
+<ul>
+<li><code class="notranslate">scaffolds.agp</code> 和 <code class="notranslate">scaffolds.raw.agp</code>: 九列 agp, 主要是对于切割后的 contig 表现形式不同，这个看自己的后续分析需求吧；</li>
+<li><code class="notranslate">scaffolds.fa</code>: 聚类完成的基因组，如果热图效果好基本可以直接用了，contig 之间有 100 bp 的 N （可调）;</li>
+<li><code class="notranslate">juicebox.sh</code>: juicer_tools 的脚本，用于生成 <code class="notranslate">.hic</code> 文件和 <code class="notranslate">.assembly</code> 文件，输入 juicer box 做后续分析或手动调整；</li>
+</ul>
+<h3>Quick view mode</h3>
+<p>以下几种情况可以使用 <code class="notranslate">--quick_view</code> 处理：</p>
+<ol>
+<li>不确定样本有多少染色体</li>
+<li>默认参数跑不动聚类异常（多倍体的情况）</li>
+<li>仅需要跑出 <code class="notranslate">.hic</code> 文件，后续希望自己调图处理</li>
+</ol>
+<h1>总结</h1>
+<p>感觉像是基于 ALLHiC 自己改了的软件，本身在自动化水平以及流程设计上很不错了，够"傻瓜" （褒义）; 也有很多的接口供用户深度使用。</p>
+<p>碍于我手上都是未公开数据，不能具体展示效果，只能口头描述：对于聚类软件，简单基因组各有各的优势，复杂基因组各有各的问题；对于简单二倍体植物基因组，HapHiC 相比我使用的 yahs 没有明显优势；对于多倍体基因组或包含冗余的复杂基因组，软件的效果又没有达到我的预期；</p>
+<p>当然这也可能是我对软件使用的比较浅，比如软件提供的基于 gfa 或 <code class="notranslate">p_utg.gfa</code> 的处理模式，限于手头数据和时间关系没有进一步测试；预印文章中提到他们做了同源四倍体马铃薯的测试，要是有时间我也想把这个数据搞下来测测看。</p>
+<h1>Reference</h1>
+<ol>
+<li><a href="https://byteofbio.com/archives/22.html" rel="nofollow">https://byteofbio.com/archives/22.html</a></li>
+<li><a href="https://github.com/zengxiaofei/HapHiC">https://github.com/zengxiaofei/HapHiC</a></li>
+<li><a href="https://www.biorxiv.org/content/10.1101/2023.11.18.567668v1.full" rel="nofollow">https://www.biorxiv.org/content/10.1101/2023.11.18.567668v1.full</a></li>
+</ol></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+</div>
+    <div id="footer">Copyright © <span id="year"></span><a href="https://WangZhSi.github.io"> 勺水清欢 </a>
+<p>
+<span id="runday"></span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a>
+</p>
+
+<script>
+if("05/23/2024"!=""){
+    var now=new Date();
+    var startSite=new Date("05/23/2024");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("year").innerHTML=now.getFullYear();
+    if(""!=""){document.getElementById("runday").innerHTML=" • "+"网站运行"+diffDay+"天"+" • ";}
+    else{document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";}
+}
+</script>
+</div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n\n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","WangZhSi/WangZhSi.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+</script>
+
+
+
+</html>
