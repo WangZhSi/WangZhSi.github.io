@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="//cdn.staticfile.net/Primer/21.0.7/primer.css" rel="stylesheet" />
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="最近在做用户行为分析，我选择了用 Rmd 来做，好迁移，好修改，部署简单；其中一块结果我希望使用类似 GitHub Contributions Chart 的样式做展示。">
+<meta property="og:title" content="类似GitHub Contributions Chart的R实现">
+<meta property="og:description" content="最近在做用户行为分析，我选择了用 Rmd 来做，好迁移，好修改，部署简单；其中一块结果我希望使用类似 GitHub Contributions Chart 的样式做展示。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://WangZhSi.github.io/post/lei-si-GitHub%20Contributions%20Chart-de-R-shi-xian.html">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG">
+<title>类似GitHub Contributions Chart的R实现</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+</style>
+<link href='https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/style.css' rel='stylesheet' /><style>.markdown-body{font-family: myFira, myLXGW, Arial;}</style><style>#postBody img {display: block; margin-left: auto; margin-right: auto;}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">类似GitHub Contributions Chart的R实现</h1>
+<div class="title-right">
+    <a href="https://WangZhSi.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/WangZhSi/WangZhSi.github.io/issues/4" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>最近在做用户行为分析，我选择了用 Rmd 来做，好迁移，好修改，部署简单；其中一块结果我希望使用类似 GitHub Contributions Chart 的样式做展示。最终实现的效果差强人意，但是折腾的过程还是挺有意思的。</p>
+<h1>关于 GitHub Contributions Chart</h1>
+<p>这个图大概长这样：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_1.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_1.png" alt="" style="max-width: 100%;"></a></p>
+<p>如果是 GitHub 上面的数据，可以使用 <a href="https://github-contributions.vercel.app" rel="nofollow">在线工具</a> 实现；那如果我要展示的是本地数据呢？分析一下，这个图本质上是一个热图，我需要的数据就是一个两列表：</p>
+<ol>
+<li>日期</li>
+<li>contributions</li>
+</ol>
+<p>下面我生成一个示例数据，逐步分享一下我是怎么做数据处理并生成图片的；</p>
+<h1>数据处理</h1>
+<p>我的实际数据是形如"2024-03-26 14:40"格式，日期+时间；需要注意，传给我的日期数据已经是 POSIXct 类型了，如果你的数据是字符串类型，需要先处理成可认读的日期格式；我们先生成类似的数据结构：</p>
+<div class="highlight highlight-source-r"><pre class="notranslate"><span class="pl-smi">data</span> <span class="pl-k">&lt;-</span> <span class="pl-k">data.frame</span>( <span class="pl-v">datetime</span> <span class="pl-k">=</span> as.POSIXct(c(<span class="pl-s"><span class="pl-pds">"</span>2024-03-26 14:40<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2024-03-27 09:15<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2024-03-28 18:30<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2024-03-29 07:00<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2024-03-30 20:45<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2024-03-31 13:20<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2024-04-01 16:10<span class="pl-pds">"</span></span>)) )</pre></div>
+<p>如果你的数据直接就是包含需要展示的 contributions 内容了，那么直接使用就可以了；我的数据不包括这部分内容，是每一行包含一个日期，这一行我期望视为一个 contribution, 这就需要 <code class="notranslate">group_by</code> 一下；</p>
+<p>首先将日期转换为周数，星期，以及计算每个日期的 contributions; 需要用到 R 包 <code class="notranslate">lubridate</code> 来解析日期时间，R 包 <code class="notranslate">dplyr</code> 处理数据：</p>
+<div class="highlight highlight-source-r"><pre class="notranslate">library(<span class="pl-smi">lubridate</span>)
+library(<span class="pl-smi">dplyr</span>)
+
+<span class="pl-c"><span class="pl-c">#</span> 提取日期，星期等信息</span>
+<span class="pl-smi">data</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">data</span> %<span class="pl-k">&gt;</span>%
+mutate(
+  <span class="pl-v">date</span> <span class="pl-k">=</span> as.Date(<span class="pl-smi">submit_time</span>),
+  <span class="pl-v">week</span> <span class="pl-k">=</span> format(<span class="pl-smi">submit_time</span>, <span class="pl-s"><span class="pl-pds">"</span>%U<span class="pl-pds">"</span></span>),
+  <span class="pl-v">weekday</span> <span class="pl-k">=</span> format(<span class="pl-smi">submit_time</span>, <span class="pl-s"><span class="pl-pds">"</span>%A<span class="pl-pds">"</span></span>),
+  <span class="pl-v">month</span> <span class="pl-k">=</span> format(<span class="pl-smi">submit_time</span>, <span class="pl-s"><span class="pl-pds">"</span>%b<span class="pl-pds">"</span></span>)
+)
+
+<span class="pl-c"><span class="pl-c">#</span> 按日期计算每日贡献次数 </span>
+<span class="pl-smi">daily_contributions</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">data</span> %<span class="pl-k">&gt;</span>% 
+  group_by(<span class="pl-smi">date</span>, <span class="pl-smi">weekday</span>, <span class="pl-smi">month</span>, <span class="pl-smi">week</span>) %<span class="pl-k">&gt;</span>%
+  summarise(<span class="pl-v">contributions</span> <span class="pl-k">=</span> n(), <span class="pl-v">.groups</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>drop<span class="pl-pds">"</span></span>) %<span class="pl-k">&gt;</span>% 
+  ungroup()
+
+<span class="pl-c"><span class="pl-c">#</span> 将 weekday 转换为因子，确保按周一到周日排序</span>
+<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">weekday</span> <span class="pl-k">&lt;-</span>     <span class="pl-k">factor</span>(<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">weekday</span>, <span class="pl-v">levels</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">"</span>Monday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Tuesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Wednesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Thursday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Friday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Saturday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Sunday<span class="pl-pds">"</span></span>))
+
+<span class="pl-c"><span class="pl-c">#</span> 将 month 转换为因子，按月份顺序排序</span>
+<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">month</span> <span class="pl-k">&lt;-</span> <span class="pl-k">factor</span>(<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">month</span>, <span class="pl-v">levels</span> <span class="pl-k">=</span> <span class="pl-c1">month.abb</span>)
+
+<span class="pl-c"><span class="pl-c">#</span> 看看效果</span>
+head(<span class="pl-smi">daily_contributions</span>)</pre></div>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contirbutions_charts_2.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contirbutions_charts_2.png" alt="" style="max-width: 100%;"></a></p>
+<p>如果直接用这个数据作图会遇到以下几个问题：</p>
+<ol>
+<li>假如数据中没有 Monday 的数据，最终展示图中就会完全没有 Monday 的图，这显然不是我们期望的；</li>
+<li>实际数据可能不需要展示全部时间的内容，比如我们只分析进一个月的用户行为，我展示近 5 周的数据就完全足够了，但是流过来的数据可能是全部时间的，需要做一步筛选；</li>
+</ol>
+<p>这里折腾了挺久，最终我的解决方案如下：</p>
+<ol>
+<li>依据数据中最终日期，计算"五周前"的日期具体是哪一天，记为 <code class="notranslate">start_time</code> ;</li>
+<li>过滤 <code class="notranslate">daily_contributions</code> 中早于 <code class="notranslate">start_time</code> 的数据；</li>
+<li>生成 <code class="notranslate">start_time</code> 到最终日期的表，记做 <code class="notranslate">all_data</code>, contributions 全部填充为 0;</li>
+<li>去除 <code class="notranslate">all_data</code> 中，<code class="notranslate">daily_contributions</code> 已包含的日期；</li>
+<li>合并两个表格；</li>
+</ol>
+<p>实际数据中应该不会出现"完全没有星期一"这种情况，但是以防万一还是处理一下吧。</p>
+<div class="highlight highlight-source-r"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 过滤掉五周前的数据</span>
+<span class="pl-smi">last_date</span> <span class="pl-k">&lt;-</span> max(<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">date</span>)
+<span class="pl-smi">start_date</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">last_date</span> <span class="pl-k">-</span> weeks(<span class="pl-c1">5</span>)
+<span class="pl-smi">daily_contributions</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">daily_contributions</span> %<span class="pl-k">&gt;</span>% 
+  filter(<span class="pl-smi">date</span> <span class="pl-k">&gt;</span><span class="pl-k">=</span> <span class="pl-smi">start_date</span>)
+
+<span class="pl-c"><span class="pl-c">#</span> 生成五周内的全数据</span>
+<span class="pl-smi">all_dates</span> <span class="pl-k">&lt;-</span> seq(<span class="pl-smi">start_date</span>, <span class="pl-smi">last_date</span>, <span class="pl-v">by</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>day<span class="pl-pds">"</span></span>) 
+<span class="pl-c"><span class="pl-c">#</span> 生成最近五周全部日期的数据框，并设置 contribution 为 0 </span>
+<span class="pl-smi">all_data</span> <span class="pl-k">&lt;-</span> <span class="pl-k">data.frame</span>( 
+  <span class="pl-v">date</span> <span class="pl-k">=</span> <span class="pl-smi">all_dates</span>, 
+  <span class="pl-v">weekday</span> <span class="pl-k">=</span> <span class="pl-k">factor</span>(weekdays(<span class="pl-smi">all_dates</span>), <span class="pl-v">levels</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">"</span>Monday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Tuesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Wednesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Thursday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Friday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Saturday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Sunday<span class="pl-pds">"</span></span>)), 
+  <span class="pl-v">month</span> <span class="pl-k">=</span> <span class="pl-k">factor</span>(months(<span class="pl-smi">all_dates</span>), <span class="pl-v">levels</span> <span class="pl-k">=</span> <span class="pl-c1">month.name</span>), 
+  <span class="pl-v">week</span> <span class="pl-k">=</span> format(<span class="pl-smi">all_dates</span>, <span class="pl-s"><span class="pl-pds">"</span>%U<span class="pl-pds">"</span></span>), 
+  <span class="pl-v">contributions</span> <span class="pl-k">=</span> <span class="pl-c1">0</span> )。
+
+<span class="pl-c"><span class="pl-c">#</span> 删除已有日期，保证以现有数据为准 </span>
+<span class="pl-smi">existing_dates</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">date</span> <span class="pl-smi">all_data</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">all_data</span>[<span class="pl-k">!</span><span class="pl-smi">all_data</span><span class="pl-k">$</span><span class="pl-smi">date</span> <span class="pl-k">%in%</span> <span class="pl-smi">existing_dates</span>, ] 
+
+<span class="pl-c"><span class="pl-c">#</span> 合并现有数据和生成数据 </span>
+<span class="pl-smi">combined_data</span> <span class="pl-k">&lt;-</span> bind_rows(<span class="pl-smi">daily_contributions</span>, <span class="pl-smi">all_data</span>)</pre></div>
+<p>由于实际数据可能出现极端值，最好处理一下；我的数据情况比较适合归一化，或者直接 pmin () 一下也行；</p>
+<div class="highlight highlight-source-r"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 归一化</span>
+<span class="pl-smi">max_contribution</span> <span class="pl-k">&lt;-</span> max(<span class="pl-smi">combined_data</span><span class="pl-k">$</span><span class="pl-smi">contributions</span>)
+<span class="pl-k">if</span>(<span class="pl-smi">max_contribution</span> <span class="pl-k">!=</span> <span class="pl-c1">0</span>) {
+  <span class="pl-smi">combined_data</span><span class="pl-k">$</span><span class="pl-smi">contributions</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">combined_data</span><span class="pl-k">$</span><span class="pl-smi">contributions</span> <span class="pl-k">/</span> <span class="pl-smi">max_contribution</span>
+}</pre></div>
+<h1>作图</h1>
+<p>作图就比较简单了，ggplot2 就可以：</p>
+<div class="highlight highlight-source-r"><pre class="notranslate">library(<span class="pl-smi">ggplot2</span>)
+
+ggplot(<span class="pl-smi">combined_data</span>, aes(
+    <span class="pl-v">x</span> <span class="pl-k">=</span> <span class="pl-smi">week</span>, 
+    <span class="pl-v">y</span> <span class="pl-k">=</span> <span class="pl-smi">weekday</span>, 
+    <span class="pl-v">fill</span> <span class="pl-k">=</span> <span class="pl-smi">contributions</span>
+  )) <span class="pl-k">+</span>
+geom_tile(<span class="pl-v">color</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>white<span class="pl-pds">"</span></span>) <span class="pl-k">+</span>
+scale_fill_gradient(<span class="pl-v">low</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>gray95<span class="pl-pds">"</span></span>, <span class="pl-v">high</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>darkgreen<span class="pl-pds">"</span></span>) <span class="pl-k">+</span>
+labs(<span class="pl-v">title</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>GitHub Contributions Heatmap<span class="pl-pds">"</span></span>,
+     <span class="pl-v">x</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Week<span class="pl-pds">"</span></span>,
+     <span class="pl-v">y</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Day of the Week<span class="pl-pds">"</span></span>,
+     <span class="pl-v">fill</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Contributions<span class="pl-pds">"</span></span>) <span class="pl-k">+</span>
+theme_bw() <span class="pl-k">+</span>
+theme(<span class="pl-v">axis.text.x</span> <span class="pl-k">=</span> element_text(<span class="pl-v">angle</span> <span class="pl-k">=</span> <span class="pl-c1">90</span>, <span class="pl-v">hjust</span> <span class="pl-k">=</span> <span class="pl-c1">1</span>))</pre></div>
+<p>效果展示：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_3.png" alt="" style="max-width: 100%;"></a></p>
+<h1>总结</h1>
+<p>美观性还是差一些，python 中的 matplotlab 似乎实现的效果好一点，但是我这限制了必需用 R 实现；能用倒是能用；</p>
+<p>明明选了近五周数据，最终体现出来的是六周，估计是上面过滤数据中 <code class="notranslate">start_date &lt;- last_date - weeks(5)</code> 这里有问题，要求严格的和可以以天为单位减，不严格就这么着吧。</p>
+<p>实际上整体不太满意，感觉部分处理有点糙，比如合并一个空表格进来这种操作，应该可以更精巧一点。但是这里需要从交付思维出发，同事需要这部分结果，那我就应该尽快交付出去，让整个流程继续向下流转；毕竟"又不是不能用", 对吧。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+</div>
+    <div id="footer">Copyright © <span id="year"></span><a href="https://WangZhSi.github.io"> 勺水清欢 </a>
+<p>
+<span id="runday"></span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a>
+</p>
+
+<script>
+if("05/23/2024"!=""){
+    var now=new Date();
+    var startSite=new Date("05/23/2024");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("year").innerHTML=now.getFullYear();
+    if(""!=""){document.getElementById("runday").innerHTML=" • "+"网站运行"+diffDay+"天"+" • ";}
+    else{document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";}
+}
+</script>
+</div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n\n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","WangZhSi/WangZhSi.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+</script>
+
+
+</html>
