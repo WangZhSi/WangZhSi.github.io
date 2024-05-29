@@ -42,7 +42,7 @@ daily_contributions <- data %>%
   ungroup()
 
 # 将 weekday 转换为因子，确保按周一到周日排序
-daily_contributions$weekday <-     factor(daily_contributions$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+daily_contributions$weekday <- factor(daily_contributions$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
 
 # 将 month 转换为因子，按月份顺序排序
 daily_contributions$month <- factor(daily_contributions$month, levels = month.abb)
@@ -75,6 +75,7 @@ daily_contributions <- daily_contributions %>%
 
 # 生成五周内的全数据
 all_dates <- seq(start_date, last_date, by = "day") 
+
 # 生成最近五周全部日期的数据框，并设置 contribution 为 0 
 all_data <- data.frame( 
   date = all_dates, 

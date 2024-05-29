@@ -104,7 +104,7 @@ mutate(
   ungroup()
 
 <span class="pl-c"><span class="pl-c">#</span> 将 weekday 转换为因子，确保按周一到周日排序</span>
-<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">weekday</span> <span class="pl-k">&lt;-</span>     <span class="pl-k">factor</span>(<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">weekday</span>, <span class="pl-v">levels</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">"</span>Monday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Tuesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Wednesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Thursday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Friday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Saturday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Sunday<span class="pl-pds">"</span></span>))
+<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">weekday</span> <span class="pl-k">&lt;-</span> <span class="pl-k">factor</span>(<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">weekday</span>, <span class="pl-v">levels</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">"</span>Monday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Tuesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Wednesday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Thursday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Friday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Saturday<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Sunday<span class="pl-pds">"</span></span>))
 
 <span class="pl-c"><span class="pl-c">#</span> 将 month 转换为因子，按月份顺序排序</span>
 <span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">month</span> <span class="pl-k">&lt;-</span> <span class="pl-k">factor</span>(<span class="pl-smi">daily_contributions</span><span class="pl-k">$</span><span class="pl-smi">month</span>, <span class="pl-v">levels</span> <span class="pl-k">=</span> <span class="pl-c1">month.abb</span>)
@@ -134,6 +134,7 @@ head(<span class="pl-smi">daily_contributions</span>)</pre></div>
 
 <span class="pl-c"><span class="pl-c">#</span> 生成五周内的全数据</span>
 <span class="pl-smi">all_dates</span> <span class="pl-k">&lt;-</span> seq(<span class="pl-smi">start_date</span>, <span class="pl-smi">last_date</span>, <span class="pl-v">by</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>day<span class="pl-pds">"</span></span>) 
+
 <span class="pl-c"><span class="pl-c">#</span> 生成最近五周全部日期的数据框，并设置 contribution 为 0 </span>
 <span class="pl-smi">all_data</span> <span class="pl-k">&lt;-</span> <span class="pl-k">data.frame</span>( 
   <span class="pl-v">date</span> <span class="pl-k">=</span> <span class="pl-smi">all_dates</span>, 
