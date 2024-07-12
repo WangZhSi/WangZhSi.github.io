@@ -1,3 +1,10 @@
+**20240712更新:**
+------
+软件作者看到了这篇教程, 指出其中错误, 并对分析挂载流程提出了相当多的宝贵意见, 具体内容已整合到一篇新的[文章](https://wangzhsi.github.io/post/HapHiC-de-an-zhuang-yu-shi-yong-%28-er-%29.html), 请移步查看.
+
+以下原文:
+------
+
 [HapHiC](https://github.com/zengxiaofei/HapHiC) 是一款 reference free 的基因组 scaffolding 软件，论文预印本发表在 [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.11.18.567668v1.full) 上。论文一作 Xiaofei Zeng 在个人博客中做了一些 HapHiC 软件的系列教程以及使用技巧，虽然今年三月的时候还回复过评论，但是文章已经很久没更新了；
 
 近期在尝试测试这个软件的时候发现找不到中文教程，不如自己写一篇，帮助有相同需求的朋友；
