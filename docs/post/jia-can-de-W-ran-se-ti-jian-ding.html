@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="# 文献信息
+
+Title: Multiple independent origins of the female W chromosome in moths and butterflies
+Journal: Science Advances
+Year: 2024
+Volume: 10 
+
+家蚕是 ZW 型性别决定，其中雄性是 ZZ 型，雌性是 ZW 型。">
+<meta property="og:title" content="家蚕的W染色体鉴定">
+<meta property="og:description" content="# 文献信息
+
+Title: Multiple independent origins of the female W chromosome in moths and butterflies
+Journal: Science Advances
+Year: 2024
+Volume: 10 
+
+家蚕是 ZW 型性别决定，其中雄性是 ZZ 型，雌性是 ZW 型。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://WangZhSi.github.io/post/jia-can-de-W-ran-se-ti-jian-ding.html">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG">
+<title>家蚕的W染色体鉴定</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+</style>
+<link href='https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/style.css' rel='stylesheet' /><style>.markdown-body{font-family: myFira, myLXGW, Arial;}</style><style>#postBody img {display: block; margin-left: auto; margin-right: auto;}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">家蚕的W染色体鉴定</h1>
+<div class="title-right">
+    <a href="https://WangZhSi.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/WangZhSi/WangZhSi.github.io/issues/6" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>文献信息</h1>
+<p>Title: Multiple independent origins of the female W chromosome in moths and butterflies<br>
+Journal: Science Advances<br>
+Year: 2024<br>
+Volume: 10</p>
+<p>家蚕是 ZW 型性别决定，其中雄性是 ZZ 型，雌性是 ZW 型。目前鳞翅目昆虫没有较好的 W 染色体组装注释结果。文章组装了家蚕的基因组，鉴定出 W 染色体，并做了 W 染色体的起源进化。文章使用了一种 chromosome quotient (CQ) 算法用于鉴定 W 染色体，这里主要看一下这个 CQ 算法是怎么实现的。</p>
+<h1>W 染色体鉴定</h1>
+<h2>原理</h2>
+<p>完成雌性家蚕基因组组装，在未分型全部组装结果中 (scaffold 和 contig), 应该包含了 Z 染色体和 W 染色体，需要做的就是将 W 染色体识别出来；如果使用雄性家蚕 (ZZ) 的测序数据，以及雌性家蚕 (ZW) 的测序数据，分别比对回组装基因组上，那么对于 Z 染色体，雄性家蚕 reads 覆盖数与雌性家蚕 reads 覆盖数的比值应趋近于 2; 对于 W 染色体，雄性家蚕 reads 覆盖数与雌性家蚕覆盖数的的比值应趋近于 0; 对于长染色体，二者比值应趋近于 1.</p>
+<p>原文如下：</p>
+<blockquote>
+<ul>
+<li>The CQ value represents the ratio of male (ZZ) to female (ZW) read coverage in a genome region.</li>
+<li>Theoretically, the CQ values obtained for the Z and W chromosomes should be close to two and zero, respectively.</li>
+</ul>
+</blockquote>
+<h2>代码实现</h2>
+<p>整体流程是使用 perl 串的，大概可以分为比对，计算 CQ 值，筛选 W 染色体三个部分；</p>
+<h3>比对</h3>
+<div class="highlight highlight-source-perl"><pre class="notranslate"><span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>bwa index -a bwtsw <span class="pl-smi">$genome</span><span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>bwa mem -t 50 <span class="pl-smi">$genome</span> <span class="pl-smi">$malereads1</span> <span class="pl-smi">$malereads2</span> &gt;<span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Male.sam<span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>bwa mem -t 50 <span class="pl-smi">$genome</span> <span class="pl-smi">$femalereads1</span> <span class="pl-smi">$femalereads2</span> &gt;<span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Female.sam<span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>samtools view -b -o <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Male.bam <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Male.sam<span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>samtools view -b -o <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Female.bam <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Female.sam<span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>samtools view -@ 50 -bq 1 <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Male.sam &gt;<span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Male_uniq.bam<span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>samtools view -@ 50 -bq 1 <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Female.sam &gt;<span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Female_uniq.bam<span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>bamToBed -i <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Male_uniq.bam &gt;<span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Male_uniq.bed<span class="pl-pds">"</span></span>;
+<span class="pl-c1">system</span><span class="pl-s"><span class="pl-pds">"</span>bamToBed -i <span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Female_uniq.bam &gt;<span class="pl-smi">$genome</span><span class="pl-cce">\_</span>Female_uniq.bed<span class="pl-pds">"</span></span>;</pre></div>
+<p>这里有几个注意点：</p>
+<ol>
+<li>sam 转 bam 时使用了 <code class="notranslate">-bq 1</code> 的参数，只保留唯一比对</li>
+<li><code class="notranslate">bamToBed</code> 方法提取了每个染色体区段 reads 的覆盖情况</li>
+</ol>
+<h3>计算 CQ 值</h3>
+<p>核心计算代码大概是下面几行：</p>
+<div class="highlight highlight-source-perl"><pre class="notranslate"><span class="pl-k">while</span>(&lt;BED&gt;){
+  <span class="pl-c1">chomp</span>;
+  <span class="pl-k">my</span> <span class="pl-smi">$line</span>=<span class="pl-smi">$_</span>;
+  <span class="pl-smi">$line</span>=~<span class="pl-sr"><span class="pl-pds"><span class="pl-c1">s</span>/</span> +</span><span class="pl-sr"><span class="pl-pds">/</span><span class="pl-cce">\t</span><span class="pl-pds">/</span></span><span class="pl-sr"><span class="pl-pds"><span class="pl-k">g</span></span></span>;
+  <span class="pl-k">my</span> <span class="pl-smi">@bed_line</span>=<span class="pl-c1">split</span>(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\t</span><span class="pl-pds">"</span></span>,<span class="pl-smi">$line</span>);
+  <span class="pl-c1">push</span> <span class="pl-smi">@ID</span>,<span class="pl-smi">$bed_line</span>[0]; 
+}
+
+<span class="pl-smi">$hash</span>{<span class="pl-smi">$_</span>}++ <span class="pl-k">for</span> <span class="pl-smi">@ID</span>; <span class="pl-c1">print</span> OUT <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$_</span><span class="pl-cce">\t</span><span class="pl-smi">$hash</span>{<span class="pl-smi">$_</span>}<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> <span class="pl-k">for</span> (<span class="pl-c1">keys</span> <span class="pl-smi">%hash</span>);</pre></div>
+<p>实际上就是计算每条染色体比对上的 reads 有多少</p>
+<h3>筛选 W 染色体</h3>
+<p>首先读取计算了雌性 (F) 和雄性 (M) 的 total reads, 累加；这里作者计算了一的总 reads 数的比值，应该是考虑到测序深度不等的情况，做个简单的校准系数：</p>
+<div class="highlight highlight-source-perl"><pre class="notranslate"><span class="pl-smi">$CorrextFactore</span>=<span class="pl-smi">$totalMUniqReads</span>/<span class="pl-smi">$totalFUniqReads</span>;</pre></div>
+<p>随后计算每条染色体的 CQ 值：</p>
+<div class="highlight highlight-source-perl"><pre class="notranslate"><span class="pl-smi">$CQvalue</span>=<span class="pl-smi">$SpeContigMreads</span>/(<span class="pl-smi">$SpeContigFreads</span>*<span class="pl-smi">$CorrextFactore</span>);
+<span class="pl-k">if</span>(<span class="pl-smi">$CQvalue</span>&gt;1.7){<span class="pl-c1">push</span> <span class="pl-smi">@AllZcontigs</span>,<span class="pl-smi">$SpeContig</span>;}
+<span class="pl-k">if</span>(<span class="pl-smi">$CQvalue</span>&lt;0.3){<span class="pl-c1">push</span> <span class="pl-smi">@AllWcontigs</span>,<span class="pl-smi">$SpeContig</span>;}</pre></div>
+<p>通过变量名称就可以看出来，分子是每条染色体上雄性 reads 数，分母是雌性 reads 数乘校准系数；</p>
+<p>可以看到老师实际分析中是以 1.7 和 0.3 做阈值筛选。</p>
+<h2>实验验证</h2>
+<p>实验验证，湿实验部分我解释不了- - 大概是这么几块实验：</p>
+<ul>
+<li>PCR 验证已知的 15 个 W 染色体片段；</li>
+<li>已有报道的 Fem 前体 blast 验证，能 blast 到已知前体；</li>
+<li>CQ 值验证其他 ZW 型物种，证明方法可靠；</li>
+</ul>
+<h1>总结</h1>
+<p>私以为对于动物来说这种方法还是比较方便的，或者说对于有完整性染色体结构的物种是一种可以泛用的方法。但是这一方法实际上要求组装结果中，至少在组装草图中已经将性染色体组装出来，否则后续筛选可能会有问题。</p>
+<p>对于高等植物，23 年白麦瓶草 (<em>Silene latifolia</em>) 的文章鉴定出了 X 染色体，这是第一个鉴定出性染色体的维管植物。其他高等植物的性别决定十分复杂，比如柳树就是一段在基因组上反复横跳的片段，不知道会不会有一些泛用的方法解决这种性别决定鉴定的问题。</p>
+<h1>Reference</h1>
+<ol>
+<li>Han, M., Luo, C., Hu, H., Lin, M., Lu, K., Shen, J., Ren, J., Ye, Y., Westhof, E., Tong, X., &amp; Dai, F. (2024). Multiple independent origins of the female W chromosome in moths and butterflies. <em>Science Advances, 10</em>.</li>
+<li>Yue, J., Krasovec, M., Kazama, Y., Zhang, X., Xie, W., Zhang, S., Xu, X., Kan, B., Ming, R., &amp; Filatov, D.A. (2023). The origin and evolution of sex chromosomes, revealed by sequencing of the Silene latifolia female genome. <em>Current Biology, 33</em>, 2504-2514.e3.</li>
+<li>Wang, D., Li, Y., Li, M., Yang, W., Ma, X., Zhang, L., Wang, Y., Feng, Y., Zhang, Y., Zhou, R., Sanderson, B.J., Keefover‐Ring, K., Yin, T., Smart, L.B., DiFazio, S.P., Liu, J., Olson, M.S., &amp; Ma, T. (2022). Repeated turnovers keep sex chromosomes young in willows. <em>Genome Biology, 23</em>.</li>
+<li><a href="https://github.com/ruio-7/CQ-package/tree/master">https://github.com/ruio-7/CQ-package/tree/master</a></li>
+</ol></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer">Copyright © <span id="year"></span><a href="https://WangZhSi.github.io"> 勺水清欢 </a>
+<p>
+<span id="runday"></span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a>
+</p>
+
+<script>
+if("05/23/2024"!=""){
+    var now=new Date();
+    var startSite=new Date("05/23/2024");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("year").innerHTML=now.getFullYear();
+    if(""!=""){document.getElementById("runday").innerHTML=" • "+"网站运行"+diffDay+"天"+" • ";}
+    else{document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";}
+}
+</script>
+</div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n\n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","WangZhSi/WangZhSi.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+</script>
+
+
+</html>
