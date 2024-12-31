@@ -1,5 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>勺水清欢</title><link>https://WangZhSi.github.io</link><description>个人工具箱, 微信公众号同名</description><copyright>勺水清欢</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG</url><title>avatar</title><link>https://WangZhSi.github.io</link></image><lastBuildDate>Tue, 10 Dec 2024 16:29:54 +0000</lastBuildDate><managingEditor>勺水清欢</managingEditor><ttl>60</ttl><webMaster>勺水清欢</webMaster><item><title>Rust编译的基因组统计工具</title><link>https://WangZhSi.github.io/post/Rust-bian-yi-de-ji-yin-zu-tong-ji-gong-ju.html</link><description>&#13;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>勺水清欢</title><link>https://WangZhSi.github.io</link><description>个人工具箱, 微信公众号同名</description><copyright>勺水清欢</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG</url><title>avatar</title><link>https://WangZhSi.github.io</link></image><lastBuildDate>Tue, 31 Dec 2024 03:50:21 +0000</lastBuildDate><managingEditor>勺水清欢</managingEditor><ttl>60</ttl><webMaster>勺水清欢</webMaster><item><title>植物超级泛基因组的发展与展望</title><link>https://WangZhSi.github.io/post/zhi-wu-chao-ji-fan-ji-yin-zu-de-fa-zhan-yu-zhan-wang.html</link><description>&#13;
+# 文献信息&#13;
+&#13;
+- **标题：** The Developments and Prospects of Plant Super Pangenomes: Demands, Approaches and Applications&#13;
+- **DOI:** 10.1016/j.xplc.2024.101230&#13;
+- **期刊：** Plant communications&#13;
+- **通讯作者：** 中国农业科学院深圳农业基因组研究所商连光研究员和崖州湾国家实验室钱前院士为本文的共同通讯作者&#13;
+- **出版日期：** 2024-12-01&#13;
+- **网址：** https://doi.org/10.1016/j.xplc.2024.101230&#13;
+&#13;
+# 超级泛基因组的研究背景与意义&#13;
+&#13;
+## 背景&#13;
+&#13;
+自人类基因组计划（HGP）启动以来，基因组学经历了从单一参考基因组到全基因组序列测定的巨大飞跃。</description><guid isPermaLink="true">https://WangZhSi.github.io/post/zhi-wu-chao-ji-fan-ji-yin-zu-de-fa-zhan-yu-zhan-wang.html</guid><pubDate>Tue, 31 Dec 2024 03:36:23 +0000</pubDate></item><item><title>Rust编译的基因组统计工具</title><link>https://WangZhSi.github.io/post/Rust-bian-yi-de-ji-yin-zu-tong-ji-gong-ju.html</link><description>&#13;
 All in one 的基因组统计工具, 主要统计了 base 信息, gap 信息, N50 信息, 以便快速了解基因组情况. Rust 编译, 运行速度还可以. 统计信息都比较基础, 写这个工具主要是图一个方便.&#13;
 &#13;
 # 参数说明&#13;
