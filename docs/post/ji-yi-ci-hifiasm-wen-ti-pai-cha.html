@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="hifiasm 是一种快速的单倍型解析从头组装工具，最初专为 PacBio HiFi 测序数据设计。">
+<meta property="og:title" content="记一次hifiasm问题排查">
+<meta property="og:description" content="hifiasm 是一种快速的单倍型解析从头组装工具，最初专为 PacBio HiFi 测序数据设计。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://WangZhSi.github.io/post/ji-yi-ci-hifiasm-wen-ti-pai-cha.html">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG">
+<title>记一次hifiasm问题排查</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+<link href='https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_assets/style.css' rel='stylesheet' /><style>.markdown-body{font-family: myFira, myLXGW, Arial;}</style><style>#postBody img {display: block; margin-left: auto; margin-right: auto;}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">记一次hifiasm问题排查</h1>
+<div class="title-right">
+    <a href="https://WangZhSi.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/WangZhSi/WangZhSi.github.io/issues/10" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>hifiasm 是一种快速的单倍型解析从头组装工具，最初专为 PacBio HiFi 测序数据设计。其最新版本支持利用超长 Oxford Nanopore 测序数据进行端粒到端粒（telomere-to-telomere, T2T）组装。Hifiasm 结合 HiFi、超长测序数据和 Hi-C 数据，能够生成目前最优质的单样本端粒到端粒组装结果。此外，在提供父本和母本的 NGS 数据的情况下，它也是分型组装（trio-binning）中最优秀的单倍型解析组装工具之一。对于人类基因组，Hifiasm 可在一天内完成端粒到端粒组装。</p>
+<p>目前 hifiasm 的 latest 版本号为 <a href="https://github.com/chhylp123/hifiasm/releases/tag/0.24.0">0.24.0-r702</a>, 从 <a href="https://github.com/chhylp123/hifiasm/releases/tag/0.20.0">0.20.0-r639</a> 版本以来，hifiasm 做了不少有关纠错部分及 ONT 组装部分的大更新，同时作者表示，高深度 (&gt;60 X) 数据产生次优组装结果是已知问题，并提供了临时解决方案。由于我之前使用的版本是 <a href="https://github.com/chhylp123/hifiasm/releases/tag/0.19.9">0.19.9-r616</a>, 对于这几个版本的更新效果非常好奇，于是准备了高深度数据对比组装结果，尤其以 0.19.9, 0.24.0 两个版本的比较为主。</p>
+<p>本次测试使用数据为 SRR26555721, 来自西瓜泛基因组的文章；HiFi base 约为 54.1G, 文章中组装大小为 364.5 M, 数据深度约 148 X.</p>
+<h1>组装结果</h1>
+<h2>组装结果统计</h2>
+<p>首先对组装结果做个基本统计：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm1.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm1.png" alt="" style="max-width: 100%;"></a></p>
+<p>这里用相同的数据跑了三个版本的 hifiasm, 全部使用默认参数，不指定 <code class="notranslate">-l</code> 或 <code class="notranslate">-n</code> 等。可以看到 0.18.9 版本和 0.19.9 版本组装结果基本一致，N 50 水平一致，总 contig 数量也差不多。而 0.24.0 版本的结果相比之下反而差一些，contig 数量较多，N50 反而会低一点。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm2"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm2" alt="" style="max-width: 100%;"></a></p>
+<p>然后看一下 N50-N90 水平，0.24.0 版本的结果也没什么优势。</p>
+<h2>三代数据回比</h2>
+<p>为了进一步比较组装质量，我将三代数据回比到了组装结果上，<code class="notranslate">minimap2</code> 比对参数为 <code class="notranslate">-x map-hifi -x asm20 --MD -a</code> 没什么特殊的，随后使用 <code class="notranslate">samtools</code> 获得 <code class="notranslate">.sort.bam </code>, 并使用 <code class="notranslate">pandepth</code> 统计覆盖度深度，有意思的来了：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm3.png" alt="" style="max-width: 100%;"></a></p>
+<p>98.8%本身很不错了，就怕别人都是 99+; 这个原因我们暂且按下不表，先看看别的评估结果；</p>
+<h2>端粒信号鉴定</h2>
+<p>使用 <code class="notranslate">quarTeT</code> 鉴定端粒特征信号，特征序列使用 <code class="notranslate">AAACCCT</code>, 统计结果如下：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm.png" alt="" style="max-width: 100%;"></a></p>
+<p>西瓜本身 11 条染色体，总计 22 个端粒，不同版本总计获得 20 个左右端粒信号，整体比较合理。</p>
+<h1>问题排查</h1>
+<p>首先我好奇为啥 0.24.0 组装版本三代数据回比结果会低一些？查看了具体比对结果后，发现部分回比结果异常，这里主要比较 0.19.9 版本的结果，与 0.24.0 版本的结果。以 <code class="notranslate">ptg000001l</code> 为例：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm5.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm5.png" alt="" style="max-width: 100%;"></a></p>
+<blockquote>
+<p>这里上图是 0.24.0 版本的结果，下图是 0.19.9 版本的结果</p>
+</blockquote>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm6.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm6.png" alt="" style="max-width: 100%;"></a></p>
+<p>可以看到，0.24.0 版本的组装结果存在一些无 reads 覆盖的区域，对于我这个例子甚至集中在端粒区。对于本身组装结果，两个版本的组装大小如下：</p>
+<ul>
+<li>v0.24.0: 35,325,984 bp</li>
+<li>v0.19.9: 35,015,304 bp</li>
+</ul>
+<p>而上面我使用 <code class="notranslate">quarTeT</code> 鉴定了端粒重复序列，对于两个 <code class="notranslate">ptg000001l</code>, 起始端重复单元重复次数如下：</p>
+<ul>
+<li>v0.24.0: 2,684 times</li>
+<li>v0.19.9: 1,529 times</li>
+</ul>
+<p>可以看到，0.24.0 版本的结果相比 0.19.9 版本的结果大了 300 kb 左右，但是差异又不全部来自端粒序列，这里我对两条 contig 用 <code class="notranslate">mumer4</code> 做了比对，结果如下：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm7.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm7.png" alt="" style="max-width: 100%;"></a></p>
+<p>对于这个问题我在 hifiasm 的 GitHub 主页上提了 issue, 作者建议我看一下 gfa 中的结果，这里可以看到，对 0.24.0 版本的结果，用于组装的 reads 没有比对回对应的位置：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm8.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm8.png" alt="" style="max-width: 100%;"></a></p>
+<p>比对 <code class="notranslate">paf</code> 文件中，显示这个 reads 比对到了其他地方：</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm9.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm9.png" alt="" style="max-width: 100%;"></a></p>
+<p>目前这个问题没有其他进展，很难讲会不会是比对的问题；我自己的话大概会继续使用 0.19.9 版本，等待这个问题有进一步答复。<a href="https://github.com/chhylp123/hifiasm/issues/757" data-hovercard-type="issue" data-hovercard-url="/chhylp123/hifiasm/issues/757/hovercard">issue</a> 的链接放在这里，有进展我也会及时同步。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://WangZhSi.github.io">勺水清欢</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("05/23/2024"!=""){
+    var startSite=new Date("05/23/2024");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","WangZhSi/WangZhSi.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+
+
+</html>
