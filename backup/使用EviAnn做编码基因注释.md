@@ -28,7 +28,7 @@ $ ./install.sh
 - `-t`: 线程数，软件涉及到比对，内存控制还可以，越多越快；
 - `-g`: 需要注释的基因组，GitHub 上写的是基因组不需要 mask, 这个问题后面再说；
 - `-r`: 记录了转录组/转录本数据的 `paired.txt` 文件，下面详细说明；
-- `-s`: 近缘物种蛋白序列；
+- `-p`: 近缘物种蛋白序列；
 
 关于 `paired.txt` 的说明 （文件不是非得叫这个名字）:
 1. 如果是双端 RNA fastq 文件，使用 tab 分隔，一行一对 reads; 可以使用 `.gz` 压缩格式；
@@ -42,7 +42,7 @@ $ ./install.sh
  /path/filename tag
 ```
 
-其中，**tag **支持以下几种格式，我直接复制不翻译了：
+其中，**tag** 支持以下几种格式，我直接复制不翻译了：
 
   1. `fastq`: indicates the data is Illumina RNA-seq in fastq format, expects one or a pair of /path/filename.fastq before the tag
   2. `fasta`: indicates the data is Illumina RNA-seq in fasta format, expects one or a pair of /path/filename.fasta before the tag

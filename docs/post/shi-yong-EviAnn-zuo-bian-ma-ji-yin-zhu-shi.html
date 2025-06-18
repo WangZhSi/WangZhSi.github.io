@@ -111,7 +111,7 @@ $ ./install.sh</pre></div>
 <li><code class="notranslate">-t</code>: 线程数，软件涉及到比对，内存控制还可以，越多越快；</li>
 <li><code class="notranslate">-g</code>: 需要注释的基因组，GitHub 上写的是基因组不需要 mask, 这个问题后面再说；</li>
 <li><code class="notranslate">-r</code>: 记录了转录组/转录本数据的 <code class="notranslate">paired.txt</code> 文件，下面详细说明；</li>
-<li><code class="notranslate">-s</code>: 近缘物种蛋白序列；</li>
+<li><code class="notranslate">-p</code>: 近缘物种蛋白序列；</li>
 </ul>
 <p>关于 <code class="notranslate">paired.txt</code> 的说明 （文件不是非得叫这个名字）:</p>
 <ol>
@@ -124,7 +124,7 @@ $ ./install.sh</pre></div>
  # or
  /path/filename tag
 </code></pre>
-<p>其中，**tag **支持以下几种格式，我直接复制不翻译了：</p>
+<p>其中，<strong>tag</strong> 支持以下几种格式，我直接复制不翻译了：</p>
 <ol>
 <li><code class="notranslate">fastq</code>: indicates the data is Illumina RNA-seq in fastq format, expects one or a pair of /path/filename.fastq before the tag</li>
 <li><code class="notranslate">fasta</code>: indicates the data is Illumina RNA-seq in fasta format, expects one or a pair of /path/filename.fasta before the tag</li>
