@@ -86,7 +86,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><p>最近在做用户行为分析，我选择了用 Rmd 来做，好迁移，好修改，部署简单；其中一块结果我希望使用类似 GitHub Contributions Chart 的样式做展示。最终实现的效果差强人意，但是折腾的过程还是挺有意思的。</p>
 <h1>关于 GitHub Contributions Chart</h1>
 <p>这个图大概长这样：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_1.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_1.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_1.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_1.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>如果是 GitHub 上面的数据，可以使用 <a href="https://github-contributions.vercel.app" rel="nofollow">在线工具</a> 实现；那如果我要展示的是本地数据呢？分析一下，这个图本质上是一个热图，我需要的数据就是一个两列表：</p>
 <ol>
 <li>日期</li>
@@ -124,7 +124,7 @@ mutate(
 
 <span class="pl-c"><span class="pl-c">#</span> 看看效果</span>
 head(<span class="pl-smi">daily_contributions</span>)</pre></div>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contirbutions_charts_2.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contirbutions_charts_2.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contirbutions_charts_2.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contirbutions_charts_2.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>如果直接用这个数据作图会遇到以下几个问题：</p>
 <ol>
 <li>假如数据中没有 Monday 的数据，最终展示图中就会完全没有 Monday 的图，这显然不是我们期望的；</li>
@@ -185,7 +185,7 @@ labs(<span class="pl-v">title</span> <span class="pl-k">=</span> <span class="pl
 theme_bw() <span class="pl-k">+</span>
 theme(<span class="pl-v">axis.text.x</span> <span class="pl-k">=</span> element_text(<span class="pl-v">angle</span> <span class="pl-k">=</span> <span class="pl-c1">90</span>, <span class="pl-v">hjust</span> <span class="pl-k">=</span> <span class="pl-c1">1</span>))</pre></div>
 <p>效果展示：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_3.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/R_contributions_charts_3.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <h1>总结</h1>
 <p>美观性还是差一些，python 中的 matplotlab 似乎实现的效果好一点，但是我这限制了必需用 R 实现；能用倒是能用；</p>
 <p>明明选了近五周数据，最终体现出来的是六周，估计是上面过滤数据中 <code class="notranslate">start_date &lt;- last_date - weeks(5)</code> 这里有问题，要求严格的和可以以天为单位减，不严格就这么着吧。</p>

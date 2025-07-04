@@ -115,15 +115,15 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="highlight highlight-source-shell"><pre class="notranslate">/path/to/HapHiC/haphic check</pre></div>
 <p>check 通过，空运行软件弹出欢迎界面，使用 <code class="notranslate">--help</code> 查看参数即可；</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">/path/to/HapHiC/haphic --help</pre></div>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p><strong>有几个点需要注意：</strong></p>
 <ol>
 <li><code class="notranslate">git clone</code> 下来的仓库名称是 HapHiC, 而基于 yml 文件构建的环境名称是 haphic; 如果你像我一样将仓库 clone 到了 conda/envs 目录下，这样这个目录会有 HapHiC 和 haphic 两个文件夹；如果介意请手动修改 yml 文件；</li>
 <li>部分 python 包是基于 pip 安装下载的，如果没有事先配置过 pip config, 下载会比较慢，部分包下载超时导致安装包错；建议事先配置 pip 的清华源；不同的 pip 用的是同一个 home 路径下的 config, 所以可以用一个已装好的 pip 配置一下；</li>
 <li>安装流程中第三步的 check 非常有必要，流程自动检查软件运行的关键包是否正确安装，哪个包失败 <code class="notranslate">pip install</code> 一下就可以了；<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic2.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic2.png" alt="" style="max-width: 100%;"></a></li>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic2.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic2.png" alt="" style="max-width: 100%; height: auto;"></a></li>
 <li>软件接口极多，部分接口和 ALLHiC 是一样的，如果之前用过 ALLHiC 可能容易理解一些；我之前没用过 ALLHiC, 啃这些接口有点吃力；发现 ALLHiC 作者还挺浪漫，用宇宙真理做随机种子：<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic3.png" alt="" style="max-width: 100%;"></a></li>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic3.png" alt="" style="max-width: 100%; height: auto;"></a></li>
 <li>软件默认基于 python 10, 所以对 gcc 版本以及 glib 库版本有一定要求，较老的集群应该无法安装；</li>
 </ol>
 <h1>软件使用</h1>

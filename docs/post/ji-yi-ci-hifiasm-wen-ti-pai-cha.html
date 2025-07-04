@@ -79,25 +79,25 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <h1>组装结果</h1>
 <h2>组装结果统计</h2>
 <p>首先对组装结果做个基本统计：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm1.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm1.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm1.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm1.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>这里用相同的数据跑了三个版本的 hifiasm, 全部使用默认参数，不指定 <code class="notranslate">-l</code> 或 <code class="notranslate">-n</code> 等。可以看到 0.18.9 版本和 0.19.9 版本组装结果基本一致，N 50 水平一致，总 contig 数量也差不多。而 0.24.0 版本的结果相比之下反而差一些，contig 数量较多，N50 反而会低一点。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm2"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm2" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm2"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm2" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>然后看一下 N50-N90 水平，0.24.0 版本的结果也没什么优势。</p>
 <h2>三代数据回比</h2>
 <p>为了进一步比较组装质量，我将三代数据回比到了组装结果上，<code class="notranslate">minimap2</code> 比对参数为 <code class="notranslate">-x map-hifi -x asm20 --MD -a</code> 没什么特殊的，随后使用 <code class="notranslate">samtools</code> 获得 <code class="notranslate">.sort.bam </code>, 并使用 <code class="notranslate">pandepth</code> 统计覆盖度深度，有意思的来了：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm3.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm3.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm3.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>98.8%本身很不错了，就怕别人都是 99+; 这个原因我们暂且按下不表，先看看别的评估结果；</p>
 <h2>端粒信号鉴定</h2>
 <p>使用 <code class="notranslate">quarTeT</code> 鉴定端粒特征信号，特征序列使用 <code class="notranslate">AAACCCT</code>, 统计结果如下：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>西瓜本身 11 条染色体，总计 22 个端粒，不同版本总计获得 20 个左右端粒信号，整体比较合理。</p>
 <h1>问题排查</h1>
 <p>首先我好奇为啥 0.24.0 组装版本三代数据回比结果会低一些？查看了具体比对结果后，发现部分回比结果异常，这里主要比较 0.19.9 版本的结果，与 0.24.0 版本的结果。以 <code class="notranslate">ptg000001l</code> 为例：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm5.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm5.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm5.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm5.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <blockquote>
 <p>这里上图是 0.24.0 版本的结果，下图是 0.19.9 版本的结果</p>
 </blockquote>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm6.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm6.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm6.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm6.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>可以看到，0.24.0 版本的组装结果存在一些无 reads 覆盖的区域，对于我这个例子甚至集中在端粒区。对于本身组装结果，两个版本的组装大小如下：</p>
 <ul>
 <li>v0.24.0: 35,325,984 bp</li>
@@ -109,11 +109,11 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <li>v0.19.9: 1,529 times</li>
 </ul>
 <p>可以看到，0.24.0 版本的结果相比 0.19.9 版本的结果大了 300 kb 左右，但是差异又不全部来自端粒序列，这里我对两条 contig 用 <code class="notranslate">mumer4</code> 做了比对，结果如下：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm7.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm7.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm7.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm7.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>对于这个问题我在 hifiasm 的 GitHub 主页上提了 issue, 作者建议我看一下 gfa 中的结果，这里可以看到，对 0.24.0 版本的结果，用于组装的 reads 没有比对回对应的位置：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm8.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm8.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm8.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm8.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>比对 <code class="notranslate">paf</code> 文件中，显示这个 reads 比对到了其他地方：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm9.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm9.png" alt="" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm9.png"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/hifiasm9.png" alt="" style="max-width: 100%; height: auto;"></a></p>
 <p>目前这个问题没有其他进展，很难讲会不会是比对的问题；我自己的话大概会继续使用 0.19.9 版本，等待这个问题有进一步答复。<a href="https://github.com/chhylp123/hifiasm/issues/757" data-hovercard-type="issue" data-hovercard-url="/chhylp123/hifiasm/issues/757/hovercard">issue</a> 的链接放在这里，有进展我也会及时同步。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
