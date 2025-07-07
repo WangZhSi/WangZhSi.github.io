@@ -91,7 +91,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>这里需要说明的是，虽然 chromap 比较快，但是同样按照 MAPQ&gt;=1 进行过滤的错误率明显高于 bwa mem，且有效 read pair 更少（如果需要数据我可以提供）。这也是我为什么推荐 bwa mem 的原因。如果是做分型的 scaffolding，首选 bwa mem。如果非要用 chromap，建议始终加上--remove_allelic_links 参数防止不同 haplotype 聚类到一起。Juicer pipeline 比对错误率比 chromap 还要高很多，且速度慢，所以任何时候都不推荐使用。</p>
 </blockquote>
 <p>同时也展示了 <code class="notranslate">bwa mem</code> 与 chromap 比对结果组装效果的对比：</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.jpg"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.jpg" alt="" style="max-width: 100%; height: auto;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.jpg"><img src="https://raw.githubusercontent.com/WangZhSi/WangZhSi.github.io/main/_images/haphic.jpg" alt="" style="max-width: 100%;"></a></p>
 <blockquote>
 <p>上图是 chromap 和 bwa mem 的直观对比，一个较高杂合的同源四倍体的案例，juicer pipeline 的情况比 chromap 还要严重很多。</p>
 <p>同源染色体之间的互作其实本来和普通的染色体之间的信号没有什么区别，我们从热图上能观察到这种沿对角线分布的信号主要有两个来源，比对和组装错误。当使用 bwa mem 比对配合 MAPQ&gt;=1 的过滤标准能很好地保证比对地准确性。组装错误可能来源于纠错过程或者 read 的分配过程，最终这些来源于不同 haplotype 的 reads 被 collapse 生成了 consensus 序列，造成了碱基水平的 switch error。HapHiC <code class="notranslate">--remove_allelic_links &lt;ploidy&gt;</code> 这个参数就是根据这个对角线信号识别等位 contig，并消除这些信号带来的不好影响。所以如果使用 chromap 做单倍体分型，建议加上这个参数。</p>
