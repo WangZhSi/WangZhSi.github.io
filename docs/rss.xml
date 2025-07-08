@@ -1,5 +1,90 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>勺水清欢</title><link>https://WangZhSi.github.io</link><description>个人工具箱, 微信公众号同名</description><copyright>勺水清欢</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG</url><title>avatar</title><link>https://WangZhSi.github.io</link></image><lastBuildDate>Thu, 03 Jul 2025 09:22:42 +0000</lastBuildDate><managingEditor>勺水清欢</managingEditor><ttl>60</ttl><webMaster>勺水清欢</webMaster><item><title>基于Minigraph-Cactus的图形泛基因组构建</title><link>https://WangZhSi.github.io/post/ji-yu-Minigraph-Cactus-de-tu-xing-fan-ji-yin-zu-gou-jian.html</link><description># Minigraph-Cactus
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>勺水清欢</title><link>https://WangZhSi.github.io</link><description>个人工具箱, 微信公众号同名</description><copyright>勺水清欢</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://cdn.jsdelivr.net/gh/WangZhSi/WangZhSi.github.io@main/_images/header.JPG</url><title>avatar</title><link>https://WangZhSi.github.io</link></image><lastBuildDate>Tue, 08 Jul 2025 10:39:50 +0000</lastBuildDate><managingEditor>勺水清欢</managingEditor><ttl>60</ttl><webMaster>勺水清欢</webMaster><item><title>基于图形泛基因组的二代数据变异检测</title><link>https://WangZhSi.github.io/post/ji-yu-tu-xing-fan-ji-yin-zu-de-er-dai-shu-ju-bian-yi-jian-ce.html</link><description># vg 的安装
+
+`vg` 是处理图形泛基因组的工具集合, 我们之前安装的 cactus 环境中本身就带了这个工具, 可以直接使用; 从头安装的话可以直接下载 GitHub 上编译好的版本:
+
+```bash
+git clone --recursive https://github.com/vgteam/vg.git
+cd vg
+```
+
+ 或者使用 conda 安装:
+
+ ```bash
+ conda install bioconda::vg
+ ```
+
+后面计划更新一篇 `vg` 支持的文件格式说明.
+
+# 二代数据变异检测
+
+这里基于上一篇文章 `minigaph-cactus` 生成的依赖文件, 我的文件前缀是 `Ath`, 具体分析时候请对照修改. 首先比对:
+
+```bash
+vg giraffe -t 16 -Z Ath.d2.gbz -m Ath.d2.min -d Ath.d2.dist -f R1.fq.gz -f R2.fq.gz &gt; giraffe.gam
+```
+
+这里 `.min`,  `.dist`, `.gbz` 都是 `minigaph-cactus` 生成的文件; 每次支持一个样本的二代 reads 的比对, 如果是双端数据, 就传入两个 `-f`, 如果是单端数据, 就传入一个 `-f`; 生成的 `.gam` 格式是二进制比对结果文件, 作者说是'vg 的 bam 格式'; 
+
+下一步计算 read 支持(support), 这里 `-Q 5` 是过滤质量值低于 5 的位点; `-s 5` 是过滤每条 read 起始/终止 5 bp 的位点:
+
+```bash
+vg pack -x Ath.d2.gbz -g giraffe.gam -t 16 -Q 5 -s 5 -o aln.pack
+```
+
+计算 `snarls`, 暂时不太理解这里是计算了个啥, 后续计划扒一下文献:
+
+```bash
+vg snarls -t 16 Ath.d2.gbz &gt; Ath.d2.snarls
+```
+
+call 变异, 这里的 `-z` 可以更快速更准确, 但是仅支持 `.gbz` 格式的输入:
+
+```bash
+vg call -t 16 Ath.d2.gbz -k aln.pack -r Ath.d2.snarls -z &gt; genotype.vcf
+```
+
+至此, 即可获得单样本的二代 reads 基于图形泛基因组的变异检测 `vcf` 文件.
+
+# 拆分染色体运行
+
+对于较大基因组或较大的图形基因组, `vg` 支持拆分染色体运行变异检测步骤, 以便并行操作, 节省周期. 比对的时候还是要做全局比对的:
+
+```bash
+vg giraffe -t 16 -Z Ath.d2.gbz -m Ath.d2.min -d Ath.d2.dist -f R1.fq.gz -f R2.fq.gz &gt; giraffe.gam
+```
+
+分割图形泛基因组文件, 我这里还是 `minigraph-cactus` 生成的 `.gbz` 格式. 程序会自动依据染色体拆分文件. 这里很奇怪的一点是, `-O` 接口指定了输出是 `.pg` 格式, 但我得到的文件是 `.vg` 格式, 不知道是哪里的问题, 不过不影响下游使用:
+
+```bash
+vg chunk -t 16 -x Ath.d2.gbz -M -O pg
+```
+
+使用 `vg augment` 过滤比对文件, 这里的条件和上面类似, 多的部分: `-s`, 标记这是一个 *subgraph*, `-m`: 依据覆盖度过滤. 这里以第一个 chunk, 也就是一号染色体为例, 我这里保存了切分后的比对文件 `chunk_1_aug.gam`:
+
+```bash
+# Abd-0#0#Chr1 是 minigraph-cactus 的 id
+# 这里要用全局的比对 gam 文件
+vg augment -t 16 chunk_Abd-0#0#Chr1.vg ../giraffe.gam -s -m 4 -q 5 -Q 5 -A chunk_1_aug.gam &gt; chunk_1_aug.pg
+```
+
+计算 `snarls`: 
+
+```bash
+vg snarls -t 16 chunk_1_aug.pg &gt; chunk_1_aug.snarls
+```
+
+计算支持度 (support):
+
+```bash
+vg pack -t 16 -x chunk_1_aug.pg -g chunk_1_aug.gam -o chunk_1_aug.pack
+```
+
+call 变异:
+
+```bash
+vg call chunk_1_aug.pg -r chunk_1_aug.snarls -k chunk_1_aug.pack &gt; chr1.genotype.vcf
+```。</description><guid isPermaLink="true">https://WangZhSi.github.io/post/ji-yu-tu-xing-fan-ji-yin-zu-de-er-dai-shu-ju-bian-yi-jian-ce.html</guid><pubDate>Tue, 08 Jul 2025 10:39:20 +0000</pubDate></item><item><title>基于Minigraph-Cactus的图形泛基因组构建</title><link>https://WangZhSi.github.io/post/ji-yu-Minigraph-Cactus-de-tu-xing-fan-ji-yin-zu-gou-jian.html</link><description># Minigraph-Cactus
 
 `Minigraph-Cactus` 是 Cactus 软件中的一个流程, 是一种**有参**的图形泛基因组构建方法. 一般用于相似基因组的比对, 比如同一物种的多个基因组. 
 
